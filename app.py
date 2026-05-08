@@ -33,7 +33,7 @@ def transcribe():
     "-ac", "1",
     "-f", "wav",
     output_file
-], che
+], check=True)
 
     wf = wave.open(output_file, "rb")
 
