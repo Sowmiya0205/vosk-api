@@ -26,13 +26,14 @@ def transcribe():
     audio.save(input_file)
 
     subprocess.run([
-        "ffmpeg",
-        "-i", input_file,
-        "-ar", "16000",
-        "-ac", "1",
-        "-f", "wav",
-        output_file
-    ])
+    "ffmpeg",
+    "-y",
+    "-i", input_file,
+    "-ar", "16000",
+    "-ac", "1",
+    "-f", "wav",
+    output_file
+], che
 
     wf = wave.open(output_file, "rb")
 
