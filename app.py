@@ -3,11 +3,11 @@ from vosk import Model, KaldiRecognizer
 import wave
 import json
 import os
+import subprocess
 
 app = Flask(__name__)
 
-MODEL_PATH = "model"
-model = Model(MODEL_PATH)
+model = Model("model")
 
 
 @app.route("/")
@@ -20,10 +20,21 @@ def transcribe():
 
     audio = request.files["audio"]
 
-    temp_file = "temp.wav"
-    audio.save(temp_file)
+    input_file = "input.webm"
+    output_file = "converted.wav"
 
-    wf = wave.open(temp_file, "rb")
+    audio.save(input_file)
+
+    subprocess.run([
+        "ffmpeg",
+        "-i", input_file,
+        "-ar", "16000",
+        "-ac", "1",
+        "-f", "wav",
+        output_file
+    ])
+
+    wf = wave.open(output_file, "rb")
 
     rec = KaldiRecognizer(model, wf.getframerate())
 
@@ -42,11 +53,11 @@ def transcribe():
     result += final.get("text", "")
 
     wf.close()
-    os.remove(temp_file)
 
-    return jsonify({
-        "text": result.strip()
-    })
+    os.remove(input_file)
+    os.remove(output_file)
+
+    return jsonify({"text": result.strip()})
 
 
 if __name__ == "__main__":
